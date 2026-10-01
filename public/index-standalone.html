@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>முட்டை பண்ணை கணக்கு - 5 சாதனங்கள்</title>
+  <meta name="theme-color" content="#b45309">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="பண்ணை கணக்கு">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Mukta Malar (Tamil) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Mukta Malar', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, button, select, textarea {
+      user-select: auto;
+    }
+    /* Hide scrollbar for clean app feel */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-stone-100 text-stone-900 min-h-screen flex flex-col justify-between pb-20 antialiased">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white shadow-lg px-4 py-3 border-b border-amber-600/40">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl p-1.5 bg-amber-600/40 rounded-2xl shadow-inner border border-amber-500/30">🥚</span>
+        <div>
+          <h1 class="text-base font-extrabold tracking-tight leading-tight">முட்டை பண்ணை</h1>
+          <p class="text-[10px] text-amber-200">5 சாதனங்கள் ஆப் (Offline & Sync)</p>
+        </div>
+      </div>
+
+      <!-- DEVICE SELECTOR (1 to 5) -->
+      <div class="flex items-center gap-1.5">
+        <select id="deviceSelect" onchange="changeDevice(this.value)" class="bg-amber-950/80 border border-amber-500/50 text-white text-xs font-bold rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400">
+          <option value="சாதனம் 1 (மேலாளர்)">👑 சாதனம் 1 (மேலாளர்)</option>
+          <option value="சாதனம் 2 (கொட்டகை 1)">🐔 சாதனம் 2 (கொட்டகை 1)</option>
+          <option value="சாதனம் 3 (கொட்டகை 2)">🐣 சாதனம் 3 (கொட்டகை 2)</option>
+          <option value="சாதனம் 4 (சேகரிப்பு)">🥚 சாதனம் 4 (சேகரிப்பு)</option>
+          <option value="சாதனம் 5 (விற்பனை)">💰 சாதனம் 5 (விற்பனை)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= FLOATING NOTIFICATION TOAST ================= -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 transform -translate-y-12 opacity-0 pointer-events-none px-4 py-2.5 bg-stone-900/95 text-white text-xs font-bold rounded-2xl shadow-2xl flex items-center gap-2 border border-amber-500/40 max-w-sm w-[90%] justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-base">🔔</span>
+      <span id="toastMsg">பதிவு செய்யப்பட்டது!</span>
+    </div>
+    <span class="text-[10px] text-amber-300 font-normal">இப்போது</span>
+  </div>
+
+  <!-- ================= MAIN VIEWPORT CONTENT ================= -->
+  <main class="max-w-md mx-auto w-full p-3 sm:p-4 flex-1">
+
+    <!-- -----------------------------------------
+         TAB 1: 🥚 உற்பத்தி (PRODUCTION)
+    ----------------------------------------- -->
+    <div id="view-prod" class="tab-view space-y-4">
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-extrabold text-amber-950 flex items-center gap-1.5">
+            <span class="text-amber-600 text-lg">🥚</span> இன்றைய முட்டை உற்பத்தி
+          </h2>
+          <span class="text-[11px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full">
+            1 தட்டு = 30 முட்டை
+          </span>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">தேதி:</label>
+            <input type="date" id="prodDate" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">தட்டுகள் (Trays):</label>
+              <input type="number" id="prodTrays" oninput="calcProdTotal()" placeholder="0" class="w-full bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-2.5 text-base font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">மீதி முட்டைகள் (Loose):</label>
+              <input type="number" id="prodLoose" oninput="calcProdTotal()" placeholder="0" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+          </div>
+
+          <!-- Total live calc -->
+          <div class="p-3 bg-amber-100/70 rounded-2xl flex items-center justify-between border border-amber-200">
+            <span class="text-xs font-bold text-amber-900">மொத்த முட்டைகள்:</span>
+            <span id="prodTotalText" class="text-base font-black text-amber-950">0 முட்டைகள் (0 தட்டுகள்)</span>
+          </div>
+
+          <button onclick="saveProduction()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 active:scale-98 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>💾 உற்பத்தியைச் சேமி</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent list -->
+      <div class="bg-white rounded-3xl p-4 shadow-sm border border-stone-200">
+        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">சமீபத்திய உற்பத்தி பதிவுகள்</h3>
+        <div id="recentProdList" class="space-y-2">
+          <p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- -----------------------------------------
+         TAB 2: 🛒 விற்பனை (SALES)
+    ----------------------------------------- -->
+    <div id="view-sales" class="tab-view hidden space-y-4">
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200">
+        <h2 class="text-base font-extrabold text-emerald-950 flex items-center gap-1.5 mb-3">
+          <span class="text-emerald-600 text-lg">🛒</span> முட்டை விற்பனை பதிவு
+        </h2>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">தேதி:</label>
+            <input type="date" id="saleDate" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-sm font-bold text-stone-800 focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">விற்ற முட்டைகள்:</label>
+              <input type="number" id="saleEggs" oninput="calcSaleTotal()" placeholder="0" class="w-full bg-emerald-50 border-2 border-emerald-300 rounded-xl px-3 py-2.5 text-base font-black text-emerald-950 focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">1 முட்டை விலை (₹):</label>
+              <input type="number" step="0.05" id="salePrice" oninput="calcSaleTotal()" placeholder="₹ 5.50" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-base font-bold text-stone-800 focus:ring-2 focus:ring-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">வாங்குபவர் பெயர் / விவரம் (விருப்பம்):</label>
+            <input type="text" id="saleBuyer" placeholder="எ.கா. சரவணன் அண்ணாச்சி கடை" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-xs font-medium text-stone-800">
+          </div>
+
+          <div class="p-3 bg-emerald-100/70 rounded-2xl flex items-center justify-between border border-emerald-200">
+            <span class="text-xs font-bold text-emerald-900">மொத்த விற்பனை தொகை:</span>
+            <span id="saleTotalText" class="text-lg font-black text-emerald-950">₹ 0</span>
+          </div>
+
+          <button onclick="saveSale()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 active:scale-98 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>💾 விற்பனையைச் சேமி</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent list -->
+      <div class="bg-white rounded-3xl p-4 shadow-sm border border-stone-200">
+        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">சமீபத்திய விற்பனை பதிவுகள்</h3>
+        <div id="recentSaleList" class="space-y-2">
+          <p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- -----------------------------------------
+         TAB 3: 📊 சுருக்கம் & கையிருப்பு (SUMMARY)
+    ----------------------------------------- -->
+    <div id="view-summary" class="tab-view hidden space-y-4">
+      <!-- Stock Hero Card -->
+      <div class="bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 text-white rounded-3xl p-5 shadow-lg border border-amber-500/30">
+        <div class="flex items-center justify-between text-amber-200 text-xs font-extrabold uppercase tracking-wider">
+          <span>📦 முட்டை கையிருப்பு (Stock In Hand)</span>
+          <span class="px-2 py-0.5 bg-white/20 rounded-full text-[10px] text-white">நிகழ்நேரம்</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-3">
+          <div>
+            <div id="stockTrays" class="text-3xl font-black tracking-tight">0 தட்டுகள்</div>
+            <p id="stockEggs" class="text-xs text-amber-200 font-bold mt-0.5">கையிருப்பு மொத்தம் 0 முட்டைகள்</p>
+          </div>
+          <span class="text-5xl opacity-80">📦</span>
+        </div>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white p-4 rounded-3xl border border-stone-200 shadow-sm">
+          <p class="text-xs font-bold text-stone-500">மொத்த உற்பத்தி</p>
+          <div id="totalProdEggs" class="text-xl font-black text-amber-950 mt-1">0</div>
+          <p class="text-[10px] text-stone-400">முட்டைகள்</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl border border-stone-200 shadow-sm">
+          <p class="text-xs font-bold text-stone-500">மொத்த விற்பனை</p>
+          <div id="totalSaleEggs" class="text-xl font-black text-emerald-950 mt-1">0</div>
+          <p class="text-[10px] text-stone-400">முட்டைகள்</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl border border-stone-200 shadow-sm">
+          <p class="text-xs font-bold text-stone-500">மொத்த வருமானம்</p>
+          <div id="totalIncome" class="text-xl font-black text-emerald-700 mt-1">₹ 0</div>
+          <p class="text-[10px] text-stone-400">விற்பனை தொகை</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl border border-stone-200 shadow-sm">
+          <p class="text-xs font-bold text-stone-500">தீவனச் செலவு</p>
+          <div id="totalFeedCost" class="text-xl font-black text-rose-700 mt-1">₹ 0</div>
+          <p class="text-[10px] text-stone-400">செலவு தொகை</p>
+        </div>
+      </div>
+
+      <!-- Net Profit Card -->
+      <div class="bg-white rounded-3xl p-5 border border-stone-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-stone-500 uppercase tracking-wide">நிகர லாப இருப்பு (Net Profit):</p>
+          <div id="netProfit" class="text-2xl font-black text-stone-900 mt-0.5">₹ 0</div>
+        </div>
+        <button onclick="shareDailyReportToWhatsApp()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-2xl shadow-md flex items-center gap-1.5 transition cursor-pointer">
+          <span>📲 WhatsApp அறிக்கை</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- -----------------------------------------
+         TAB 4: 🌾 தீவனம் (FEED)
+    ----------------------------------------- -->
+    <div id="view-feed" class="tab-view hidden space-y-4">
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200">
+        <h2 class="text-base font-extrabold text-stone-900 flex items-center gap-1.5 mb-3">
+          <span class="text-amber-700 text-lg">🌾</span> தீவன வரவு / செலவு பதிவு
+        </h2>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">தேதி:</label>
+            <input type="date" id="feedDate" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-sm font-bold text-stone-800">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">தீவன மூட்டைகள்:</label>
+              <input type="number" id="feedBags" placeholder="0" class="w-full bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-2.5 text-base font-black text-amber-950">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">செலவு தொகை (₹):</label>
+              <input type="number" id="feedAmount" placeholder="₹ 0" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-base font-bold text-stone-800">
+            </div>
+          </div>
+
+          <button onclick="saveFeed()" class="w-full py-3.5 bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-900 hover:to-stone-900 active:scale-98 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>💾 தீவனப் பதிவைச் சேமி</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-4 shadow-sm border border-stone-200">
+        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">தீவன வரலாற்றுப் பதிவுகள்</h3>
+        <div id="recentFeedList" class="space-y-2">
+          <p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- -----------------------------------------
+         TAB 5: 📜 வரலாறு & 5 போன்கள் Sync (HISTORY)
+    ----------------------------------------- -->
+    <div id="view-history" class="tab-view hidden space-y-4">
+      <!-- 5 Phones Sync Card -->
+      <div class="bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 text-white rounded-3xl p-5 shadow-lg space-y-3 border border-stone-700">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2.5 bg-amber-500 text-stone-950 rounded-2xl text-xl font-bold shadow-md">📲</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">5 போன்களையும் ஒத்திசைக்க (Sync)</h3>
+            <p class="text-[11px] text-stone-300">வாட்ஸ்அப் மூலம் டேட்டாவை 1 நொடியில் பகிரலாம்</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="exportDataToWhatsApp()" class="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+            <span>📤 WhatsApp பேக்கப்</span>
+          </button>
+          <button onclick="triggerImport()" class="py-2.5 px-3 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+            <span>📥 டேட்டா ஏற்று (Import)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- History log -->
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-extrabold text-stone-900">அனைத்து வரலாற்றுப் பதிவுகள்</h3>
+          <span id="historyCount" class="text-xs font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">0 பதிவுகள்</span>
+        </div>
+        <div id="allHistoryList" class="space-y-2 max-h-96 overflow-y-auto pr-1">
+          <p class="text-xs text-stone-400 py-4 text-center">இன்னும் பதிவுகள் இல்லை</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FIXED BOTTOM NAVIGATION BAR ================= -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-amber-200/80 px-2 py-1.5 shadow-lg">
+    <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center">
+      <button onclick="switchTab('prod')" id="nav-prod" class="nav-btn py-1.5 px-1 rounded-2xl flex flex-col items-center gap-0.5 text-amber-900 font-extrabold bg-amber-100 transition">
+        <span class="text-lg">🥚</span>
+        <span class="text-[10px] tracking-tight">உற்பத்தி</span>
+      </button>
+
+      <button onclick="switchTab('sales')" id="nav-sales" class="nav-btn py-1.5 px-1 rounded-2xl flex flex-col items-center gap-0.5 text-stone-500 font-bold hover:text-stone-900 transition">
+        <span class="text-lg">🛒</span>
+        <span class="text-[10px] tracking-tight">விற்பனை</span>
+      </button>
+
+      <button onclick="switchTab('summary')" id="nav-summary" class="nav-btn py-1.5 px-1 rounded-2xl flex flex-col items-center gap-0.5 text-stone-500 font-bold hover:text-stone-900 transition">
+        <span class="text-lg">📊</span>
+        <span class="text-[10px] tracking-tight">சுருக்கம்</span>
+      </button>
+
+      <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn py-1.5 px-1 rounded-2xl flex flex-col items-center gap-0.5 text-stone-500 font-bold hover:text-stone-900 transition">
+        <span class="text-lg">🌾</span>
+        <span class="text-[10px] tracking-tight">தீவனம்</span>
+      </button>
+
+      <button onclick="switchTab('history')" id="nav-history" class="nav-btn py-1.5 px-1 rounded-2xl flex flex-col items-center gap-0.5 text-stone-500 font-bold hover:text-stone-900 transition">
+        <span class="text-lg">📜</span>
+        <span class="text-[10px] tracking-tight">வரலாறு</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    // Storage Key
+    const STORAGE_KEY = 'muttai_pannai_standalone_v1';
+
+    // Application State
+    let appState = {
+      device: 'சாதனம் 1 (மேலாளர்)',
+      production: [],
+      sales: [],
+      feed: [],
+      history: []
+    };
+
+    // Load state from phone localStorage
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          appState = { ...appState, ...parsed };
+        }
+      } catch (e) {
+        console.error('Error loading data:', e);
+      }
+      if (document.getElementById('deviceSelect')) {
+        document.getElementById('deviceSelect').value = appState.device;
+      }
+    }
+
+    // Save state to phone localStorage
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        renderAll();
+      } catch (e) {
+        console.error('Error saving data:', e);
+      }
+    }
+
+    // Change current device (1 to 5)
+    function changeDevice(name) {
+      appState.device = name;
+      saveState();
+      showToast('📱 சாதனம் மாற்றப்பட்டது: ' + name);
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-100', 'text-amber-900', 'font-extrabold');
+        btn.classList.add('text-stone-500', 'font-bold');
+      });
+
+      const activeView = document.getElementById('view-' + tabId);
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.add('bg-amber-100', 'text-amber-900', 'font-extrabold');
+        activeNav.classList.remove('text-stone-500', 'font-bold');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Web Audio Synthesizer Chime (Clear, crisp 2-note bell)
+    function playChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        // Note 1: E5 (659.25 Hz)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(659.25, now);
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.3, now + 0.04);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+
+        // Note 2: A5 (880 Hz)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(880, now + 0.12);
+        gain2.gain.setValueAtTime(0, now + 0.12);
+        gain2.gain.linearRampToValueAtTime(0.35, now + 0.16);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.65);
+
+        if ('vibrate' in navigator) {
+          navigator.vibrate([100, 50, 150]);
+        }
+      } catch (e) {
+        console.warn('Audio play error:', e);
+      }
+    }
+
+    // Toast message banner
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', '-translate-y-12', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-12', 'pointer-events-none');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 4000);
+    }
+
+    // 1. Production Calculation & Save
+    function calcProdTotal() {
+      const trays = parseFloat(document.getElementById('prodTrays').value) || 0;
+      const loose = parseInt(document.getElementById('prodLoose').value) || 0;
+      const total = Math.round(trays * 30) + loose;
+      document.getElementById('prodTotalText').textContent = `${total.toLocaleString('en-IN')} முட்டைகள் (${trays} தட்டுகள் + ${loose} மீதி)`;
+    }
+
+    function saveProduction() {
+      const date = document.getElementById('prodDate').value;
+      const trays = parseFloat(document.getElementById('prodTrays').value) || 0;
+      const loose = parseInt(document.getElementById('prodLoose').value) || 0;
+      const total = Math.round(trays * 30) + loose;
+
+      if (total <= 0) {
+        alert('தயவுசெய்து முட்டை எண்ணிக்கை அல்லது தட்டுகளை உள்ளிடவும்.');
+        return;
+      }
+
+      const row = {
+        id: Date.now(),
+        date: date || new Date().toISOString().split('T')[0],
+        trays,
+        loose,
+        eggs: total,
+        device: appState.device,
+        time: new Date().toLocaleTimeString('ta-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      appState.production.unshift(row);
+      appState.history.unshift({
+        id: Date.now(),
+        type: 'prod',
+        title: `உற்பத்தி: ${total} முட்டைகள் (${trays} தட்டுகள்)`,
+        date: row.date,
+        device: appState.device,
+        time: row.time
+      });
+
+      document.getElementById('prodTrays').value = '';
+      document.getElementById('prodLoose').value = '';
+      calcProdTotal();
+
+      saveState();
+      playChime();
+      showToast(`🥚 ${total} முட்டைகள் உற்பத்தி பதிவு செய்யப்பட்டது!`);
+    }
+
+    // 2. Sales Calculation & Save
+    function calcSaleTotal() {
+      const eggs = parseInt(document.getElementById('saleEggs').value) || 0;
+      const price = parseFloat(document.getElementById('salePrice').value) || 0;
+      const total = Math.round(eggs * price);
+      document.getElementById('saleTotalText').textContent = '₹ ' + total.toLocaleString('en-IN');
+    }
+
+    function saveSale() {
+      const date = document.getElementById('saleDate').value;
+      const eggs = parseInt(document.getElementById('saleEggs').value) || 0;
+      const price = parseFloat(document.getElementById('salePrice').value) || 0;
+      const buyer = document.getElementById('saleBuyer').value.trim();
+      const amount = Math.round(eggs * price);
+
+      if (eggs <= 0) {
+        alert('தயவுசெய்து விற்பனை செய்த முட்டை எண்ணிக்கையை உள்ளிடவும்.');
+        return;
+      }
+
+      const row = {
+        id: Date.now(),
+        date: date || new Date().toISOString().split('T')[0],
+        eggs,
+        price,
+        amount,
+        buyer,
+        device: appState.device,
+        time: new Date().toLocaleTimeString('ta-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      appState.sales.unshift(row);
+      appState.history.unshift({
+        id: Date.now(),
+        type: 'sale',
+        title: `விற்பனை: ${eggs} முட்டை (₹ ${amount}) ${buyer ? '- ' + buyer : ''}`,
+        date: row.date,
+        device: appState.device,
+        time: row.time
+      });
+
+      document.getElementById('saleEggs').value = '';
+      document.getElementById('saleBuyer').value = '';
+      calcSaleTotal();
+
+      saveState();
+      playChime();
+      showToast(`🛒 ${eggs} முட்டைகள் (₹ ${amount}) விற்பனை பதிவானது!`);
+    }
+
+    // 3. Feed Save
+    function saveFeed() {
+      const date = document.getElementById('feedDate').value;
+      const bags = parseFloat(document.getElementById('feedBags').value) || 0;
+      const amount = parseFloat(document.getElementById('feedAmount').value) || 0;
+
+      if (bags <= 0 && amount <= 0) {
+        alert('தயவுசெய்து தீவன மூட்டைகள் அல்லது செலவு தொகையை உள்ளிடவும்.');
+        return;
+      }
+
+      const row = {
+        id: Date.now(),
+        date: date || new Date().toISOString().split('T')[0],
+        bags,
+        amount,
+        device: appState.device,
+        time: new Date().toLocaleTimeString('ta-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      appState.feed.unshift(row);
+      appState.history.unshift({
+        id: Date.now(),
+        type: 'feed',
+        title: `தீவனம்: ${bags} மூட்டைகள் (செலவு ₹ ${amount})`,
+        date: row.date,
+        device: appState.device,
+        time: row.time
+      });
+
+      document.getElementById('feedBags').value = '';
+      document.getElementById('feedAmount').value = '';
+
+      saveState();
+      playChime();
+      showToast('🌾 தீவனப் பதிவு சேமிக்கப்பட்டது!');
+    }
+
+    // Delete Item
+    function deleteRecord(listName, id) {
+      if (!confirm('இந்த பதிவை நீக்க விரும்புகிறீர்களா?')) return;
+      appState[listName] = appState[listName].filter(item => item.id !== id);
+      appState.history = appState.history.filter(item => item.id !== id);
+      saveState();
+      showToast('🗑️ பதிவு நீக்கப்பட்டது');
+    }
+
+    // Render All UI Elements
+    function renderAll() {
+      // 1. Render Production List
+      const pList = document.getElementById('recentProdList');
+      if (appState.production.length === 0) {
+        pList.innerHTML = '<p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>';
+      } else {
+        pList.innerHTML = appState.production.slice(0, 5).map(p => `
+          <div class="flex items-center justify-between p-2.5 bg-amber-50/60 rounded-2xl border border-amber-100 text-xs">
+            <div>
+              <div class="font-extrabold text-amber-950">${p.eggs} முட்டைகள் (${p.trays} தட்டுகள் ${p.loose ? '+ ' + p.loose : ''})</div>
+              <div class="text-[10px] text-stone-500">${p.date} • ${p.time || ''} • <span class="font-bold text-amber-800">${p.device || 'சாதனம்'}</span></div>
+            </div>
+            <button onclick="deleteRecord('production', ${p.id})" class="text-stone-400 hover:text-rose-600 p-1.5 text-xs font-bold">நீக்கு</button>
+          </div>
+        `).join('');
+      }
+
+      // 2. Render Sales List
+      const sList = document.getElementById('recentSaleList');
+      if (appState.sales.length === 0) {
+        sList.innerHTML = '<p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>';
+      } else {
+        sList.innerHTML = appState.sales.slice(0, 5).map(s => `
+          <div class="flex items-center justify-between p-2.5 bg-emerald-50/60 rounded-2xl border border-emerald-100 text-xs">
+            <div>
+              <div class="font-extrabold text-emerald-950">${s.eggs} முட்டைகள் (₹ ${s.price}/முட்டை)</div>
+              <div class="text-[10px] text-stone-500">${s.date} • ${s.buyer || 'நேரடி விற்பனை'} • <span class="font-bold text-emerald-800">${s.device || 'சாதனம்'}</span></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="text-right font-black text-emerald-700 text-sm">₹ ${s.amount}</div>
+              <button onclick="deleteRecord('sales', ${s.id})" class="text-stone-400 hover:text-rose-600 p-1 text-xs">✕</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 3. Render Feed List
+      const fList = document.getElementById('recentFeedList');
+      if (appState.feed.length === 0) {
+        fList.innerHTML = '<p class="text-xs text-stone-400 py-3 text-center">இன்னும் பதிவுகள் இல்லை</p>';
+      } else {
+        fList.innerHTML = appState.feed.slice(0, 5).map(f => `
+          <div class="flex items-center justify-between p-2.5 bg-stone-50 rounded-2xl border border-stone-200 text-xs">
+            <div>
+              <div class="font-extrabold text-stone-900">${f.bags} மூட்டைகள்</div>
+              <div class="text-[10px] text-stone-500">${f.date} • <span class="font-bold text-stone-700">${f.device || 'சாதனம்'}</span></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="text-right font-black text-rose-700 text-sm">₹ ${f.amount}</div>
+              <button onclick="deleteRecord('feed', ${f.id})" class="text-stone-400 hover:text-rose-600 p-1 text-xs">✕</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 4. Render History List
+      const hList = document.getElementById('allHistoryList');
+      document.getElementById('historyCount').textContent = appState.history.length + ' பதிவுகள்';
+      if (appState.history.length === 0) {
+        hList.innerHTML = '<p class="text-xs text-stone-400 py-4 text-center">இன்னும் பதிவுகள் இல்லை</p>';
+      } else {
+        hList.innerHTML = appState.history.map(h => `
+          <div class="p-2.5 bg-stone-50 rounded-2xl border border-stone-200 text-xs flex items-center justify-between">
+            <div>
+              <p class="font-bold text-stone-900">${h.title}</p>
+              <p class="text-[10px] text-stone-500">${h.date} • ${h.time || ''} • <span class="text-amber-800 font-semibold">${h.device || 'சாதனம்'}</span></p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 5. Calculations for Summary
+      const totProd = appState.production.reduce((acc, p) => acc + (Number(p.eggs) || 0), 0);
+      const totSale = appState.sales.reduce((acc, s) => acc + (Number(s.eggs) || 0), 0);
+      const totIncome = appState.sales.reduce((acc, s) => acc + (Number(s.amount) || 0), 0);
+      const totCost = appState.feed.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
+      const stock = Math.max(0, totProd - totSale);
+      const stockTrays = Math.floor(stock / 30);
+      const stockLoose = stock % 30;
+
+      document.getElementById('totalProdEggs').textContent = totProd.toLocaleString('en-IN');
+      document.getElementById('totalSaleEggs').textContent = totSale.toLocaleString('en-IN');
+      document.getElementById('totalIncome').textContent = '₹ ' + totIncome.toLocaleString('en-IN');
+      document.getElementById('totalFeedCost').textContent = '₹ ' + totCost.toLocaleString('en-IN');
+      document.getElementById('netProfit').textContent = '₹ ' + (totIncome - totCost).toLocaleString('en-IN');
+
+      document.getElementById('stockTrays').textContent = stockTrays + ' தட்டுகள் ' + (stockLoose > 0 ? ('+ ' + stockLoose + ' முட்டை') : '');
+      document.getElementById('stockEggs').textContent = 'கையிருப்பு மொத்தம் ' + stock.toLocaleString('en-IN') + ' முட்டைகள்';
+    }
+
+    // 1-Click WhatsApp Daily Report
+    function shareDailyReportToWhatsApp() {
+      const totProd = appState.production.reduce((acc, p) => acc + (Number(p.eggs) || 0), 0);
+      const totSale = appState.sales.reduce((acc, s) => acc + (Number(s.eggs) || 0), 0);
+      const totIncome = appState.sales.reduce((acc, s) => acc + (Number(s.amount) || 0), 0);
+      const totCost = appState.feed.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
+      const stock = Math.max(0, totProd - totSale);
+      const stockTrays = Math.floor(stock / 30);
+
+      const today = new Date().toISOString().split('T')[0];
+      const msg = `📊 முட்டை பண்ணை கணக்கு அறிக்கை (${today}):\n\n` +
+        `🥚 மொத்த உற்பத்தி: ${totProd} முட்டைகள்\n` +
+        `🛒 மொத்த விற்பனை: ${totSale} முட்டைகள்\n` +
+        `📦 கையிருப்பு முட்டை: ${stockTrays} தட்டுகள் (${stock} முட்டைகள்)\n` +
+        `💰 மொத்த வருமானம்: ₹ ${totIncome}\n` +
+        `🌾 தீவனச் செலவு: ₹ ${totCost}\n` +
+        `💵 நிகர லாப இருப்பு: ₹ ${totIncome - totCost}\n\n` +
+        `அனுப்பிய சாதனம்: ${appState.device}`;
+
+      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(msg), '_blank');
+    }
+
+    // 5 Phones Sync via WhatsApp Code
+    function exportDataToWhatsApp() {
+      const dataStr = JSON.stringify(appState);
+      const base64 = btoa(unescape(encodeURIComponent(dataStr)));
+      const text = `🔄 முட்டை பண்ணை 5 போன்கள் டேட்டா பேக்கப்:\n\nகீழே உள்ள குறியீட்டை காப்பி செய்து மற்ற போனில் "டேட்டா ஏற்று" என்பதில் ஒட்டவும்:\n\n#DATA#${base64}#END#`;
+      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function triggerImport() {
+      const code = prompt('மற்ற போனில் இருந்து வந்த WhatsApp டேட்டா குறியீட்டை (Paste Backup Code) இங்கே ஒட்டவும்:');
+      if (!code) return;
+
+      try {
+        let clean = code;
+        if (code.includes('#DATA#') && code.includes('#END#')) {
+          clean = code.split('#DATA#')[1].split('#END#')[0];
+        }
+        const decoded = decodeURIComponent(escape(atob(clean.trim())));
+        const imported = JSON.parse(decoded);
+        if (imported && (imported.production || imported.sales)) {
+          appState = imported;
+          saveState();
+          showToast('✅ அனைத்து போன்களின் டேட்டாவும் வெற்றிகரமாக ஏற்றப்பட்டது!');
+        } else {
+          alert('தவறான டேட்டா வடிவம்');
+        }
+      } catch (e) {
+        alert('டேட்டாவை ஏற்றுவதில் பிழை ஏற்பட்டது. குறியீட்டைச் சரியாக ஒட்டவும்.');
+      }
+    }
+
+    // Initialize dates and load saved data
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      if (document.getElementById('prodDate')) document.getElementById('prodDate').value = today;
+      if (document.getElementById('saleDate')) document.getElementById('saleDate').value = today;
+      if (document.getElementById('feedDate')) document.getElementById('feedDate').value = today;
+      loadState();
+      renderAll();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "முட்டை பண்ணை கணக்கு - Egg Farm Multi-Device Manager",
+  "description": "5 சாதனங்கள் வரை நிகழ்நேர பகிர்வு மற்றும் உடனடி அறிவிப்புகளுடன் கூடிய முட்டை பண்ணை கணக்கு மேலாண்மை செயலி (Multi-device real-time synced egg farm account management with instant broadcast notifications).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

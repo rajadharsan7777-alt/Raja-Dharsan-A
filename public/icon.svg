@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <linearGradient id="eggGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="85%" stop-color="#fffbeb" />
+      <stop offset="100%" stop-color="#fef3c7" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#78350f" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <!-- Background with rounded squircle for maskable/app icon -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)" />
+  
+  <!-- Egg 1 (Background left) -->
+  <ellipse cx="200" cy="270" rx="90" ry="120" transform="rotate(-15 200 270)" fill="#fef3c7" opacity="0.85" filter="url(#shadow)" />
+  
+  <!-- Egg 2 (Background right) -->
+  <ellipse cx="320" cy="265" rx="85" ry="115" transform="rotate(18 320 265)" fill="#fff7ed" opacity="0.9" filter="url(#shadow)" />
+
+  <!-- Main Center Egg -->
+  <ellipse cx="256" cy="250" rx="105" ry="145" fill="url(#eggGrad)" filter="url(#shadow)" />
+  <!-- Egg specular highlight -->
+  <ellipse cx="225" cy="200" rx="35" ry="55" transform="rotate(-25 225 200)" fill="#ffffff" opacity="0.75" />
+
+  <!-- Tray / Nest bottom decoration -->
+  <path d="M 120 370 Q 256 420 392 370 L 372 405 Q 256 445 140 405 Z" fill="#92400e" />
+  
+  <!-- Farm rooster crown / emblem top badge -->
+  <circle cx="256" cy="115" r="28" fill="#ef4444" />
+  <circle cx="230" cy="125" r="20" fill="#ef4444" />
+  <circle cx="282" cy="125" r="20" fill="#ef4444" />
+</svg>

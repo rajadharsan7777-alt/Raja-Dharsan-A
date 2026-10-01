@@ -1,11 +1,43 @@
-<div align="center">
+# முட்டை பண்ணை கணக்கு மேலாண்மை (Egg Farm Management App)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+5 சாதனங்கள் வரை நிகழ்நேர பகிர்வு மற்றும் உடனடி அறிவிப்புகளுடன் கூடிய முட்டை பண்ணை கணக்கு செயலி.
 
-  <h1>Built with AI Studio</h2>
+---
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## 📁 உள்ளடக்கம் (Included Files)
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+- `src/` : அனைத்து React TypeScript மூலக் குறியீடுகள் (Components, Hooks, Types, CSS)
+- `public/` : PWA Icons, Manifest, Service Worker மற்றும் ஆப்லைன் Standalone HTML கோப்புகள்
+- `public/muttai_pannai.html` : **எந்த சர்வர் அல்லது Node.js-உம் தேவையின்றி, பிரவுசரில் தொட்டுத் திறந்தாலே இயங்கும் முழுமையான ஆப்லைன் கோப்பு!**
+- `server.ts` : 5 சாதனங்கள் நிகழ்நேர ஒத்திசைவுக்கான WebSocket மற்றும் REST API சர்வர்
+- `data/` : தரவு சேமிப்பு கோப்பு (`egg_farm_store.json`)
+- `package.json` : திட்ட அமைப்புகள் மற்றும் Node.js நூலகங்கள்
+- `vite.config.ts` : Vite பில்டர் கட்டமைப்பு
 
-</div>
+---
+
+## 🚀 கணினியில் / சர்வரில் இயக்குவது எப்படி? (How to Run)
+
+### முறை 1: நேரடியாகத் திறக்க (No Node.js Required)
+`public/muttai_pannai.html` கோப்பை எந்த ஒரு கம்ப்யூட்டர் அல்லது போன் பிரவுசரிலும் (Chrome, Safari) நேரடியாக டபுள் கிளிக் செய்து திறந்து உடனே பயன்படுத்தலாம்.
+
+### முறை 2: முழு வளர்ச்சி முறையில் இயக்க (Node.js Full-Stack Dev)
+1. இக்கோப்பகத்தில் டெர்மினல் திறக்கவும்:
+   ```bash
+   npm install
+   ```
+2. பயன்பாட்டைத் தொடங்கவும்:
+   ```bash
+   npm run dev
+   ```
+3. பிரவுசரில் திறக்கவும்:
+   `http://localhost:3000`
+
+---
+
+## ✨ முக்கிய அம்சங்கள் (Key Features)
+1. **முட்டை உற்பத்தி (Egg Production):** தட்டு (Tray) மற்றும் சில்லறை கணக்கு, சேதமடைந்த முட்டைகள்.
+2. **முட்டை விற்பனை (Sales):** மொத்த விற்பனை, விலை நிர்ணயம், நேரடி வருவாய் கணக்கு.
+3. **கையிருப்பு & லாப நட்டம் (Stock & Financial Summary):** நிகர முட்டை இருப்பு, மொத்த வருமானம், தீவனச் செலவு, நிகர லாபம்.
+4. **தீவனக் கணக்கு (Feed Management):** தீவன வரவு, செலவுத் தொகை, சாக்குகள் இருப்பு.
+5. **5 போன்கள் உடனடி மணி ஒலி (Real-Time Chime & Multi-Device Sync):** WebSocket மூலம் சாதனங்களுக்கு இடையே நேரடி ஒத்திசைவு.
